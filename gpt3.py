@@ -31,7 +31,7 @@ messages = [
 layout = [
     [sg.Text("Chat with AI", font=("Arial", 12))],
     [sg.Multiline(key="-INPUT-", size=(100, 10),font=("Arial", 12))],
-    [sg.Button("Ask",button_color=('black', 'lightgreen')),sg.Button("Save", button_color=('black', 'orange')), sg.Button("Leave", button_color=('black', 'red'))],
+    [sg.Button("Ask",button_color=('black', 'lightgreen')),sg.Button("Save", button_color=('black', 'orange')), sg.Button("Leave", button_color=('black', 'red')), sg.Button("Clear", button_color=('black', 'grey'))],
     [sg.Output(size=(100, 40), key="-OUTPUT-",font=("Arial", 12))],
     [sg.Text("Powered by Razorpay - ChatGPT", font=("Arial", 12))]
     
@@ -55,6 +55,7 @@ while True:
             print(f"User: {input_text}\n")
             print("-------------------------------------x-------------------------------------------------")
             print(f"\nAI: {reply}")
+            window["-INPUT-"].update("")
     elif event == "Save":
         filename = sg.popup_get_file(
             "Save chat log as:",
@@ -67,4 +68,6 @@ while True:
                 for message in messages:
                     f.write(f"{message['role']}: {message['content']}\n")
             sg.popup(f"Chat log saved to {filename}")
+    elif event == "Clear":
+        window["-OUTPUT-"].update("")
 window.close()
