@@ -1,7 +1,10 @@
 import openai
 import PySimpleGUI as sg
 
-openai.api_key = "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"
+with open('openai_api_key.txt', 'r') as file:
+    api_key = file.read().strip()
+
+openai.api_key = api_key
 
 my_theme = {
     "BACKGROUND": "#0D94FB",
@@ -28,7 +31,7 @@ messages = [
 layout = [
     [sg.Text("Chat with AI", font=("Arial", 12))],
     [sg.Multiline(key="-INPUT-", size=(100, 10),font=("Arial", 12))],
-    [sg.Button("Ask"),sg.Button("Save"), sg.Button("Leave")],
+    [sg.Button("Ask",button_color=('black', 'lightgreen')),sg.Button("Save", button_color=('black', 'orange')), sg.Button("Leave", button_color=('black', 'red'))],
     [sg.Output(size=(100, 40), key="-OUTPUT-",font=("Arial", 12))],
     [sg.Text("Powered by Razorpay - ChatGPT", font=("Arial", 12))]
     
@@ -49,8 +52,9 @@ while True:
             )
             reply = chat.choices[0].message.content
             messages.append({"role": "assistant", "content": reply})
-            print(f"User: {input_text}")
-            print(f"AI: {reply}")
+            print(f"User: {input_text}\n")
+            print("-------------------------------------x-------------------------------------------------")
+            print(f"\nAI: {reply}")
     elif event == "Save":
         filename = sg.popup_get_file(
             "Save chat log as:",
