@@ -1,5 +1,8 @@
 import openai
 import PySimpleGUI as sg
+import requests
+import webbrowser
+import re
 
 with open('openai_api_key.txt', 'r') as file:
     api_key = file.read().strip()
@@ -7,9 +10,9 @@ with open('openai_api_key.txt', 'r') as file:
 openai.api_key = api_key
 
 my_theme = {
-    "BACKGROUND": "#0D94FB",
+    "BACKGROUND": "#3A3B3C",
     "TEXT": "#ffffff",
-    "INPUT": "#012652",
+    "INPUT": "#0C090A",
     "TEXT_INPUT": "#E5E4E2",
     "SCROLL": "#c7e78b",
     "BUTTON": ("#000080", "#ffffff"),
@@ -39,6 +42,29 @@ layout = [
 
 window = sg.Window("LazyNinJa-Shuriken bot", layout)
 
+def generate_image(prompt):
+    url = "https://api.openai.com/v1/images/generations"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {openai.api_key}"
+    }
+    data = {
+        "prompt": prompt,
+        "n": 1,
+        "response_format":"url",
+        "size": "512x512"
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    output = response.json()
+    print (f"AI:  {response.json()}")
+    url_key = output['data']
+    url = url_key[0]['url']
+    webbrowser.open(url)
+
+    print("-------------------------------------x-------------------------------------------------")
+
+
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == "Leave":
@@ -47,14 +73,27 @@ while True:
         input_text = values["-INPUT-"]
         if input_text:
             messages.append({"role": "user", "content": input_text})
-            chat = openai.ChatCompletion.create(
+            prompt = input_text.replace("image of", "").strip()
+            if "image of" in input_text:
+                print(f"User:  {input_text}\n")
+                print("-------------------------------------x-------------------------------------------------")
+                generate_image(prompt)
+            else:
+                chat = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo", messages=messages
-            )
-            reply = chat.choices[0].message.content
-            messages.append({"role": "assistant", "content": reply})
-            print(f"User: {input_text}\n")
-            print("-------------------------------------x-------------------------------------------------")
-            print(f"\nAI: {reply}")
+                )
+                reply = chat.choices[0].message.content
+                messages.append({"role": "assistant", "content": reply})
+                print(f"User:  {input_text}\n")
+                print("-------------------------------------x-------------------------------------------------")
+                print(f"\nAI: {reply}")
+                match = re.search("(?P<url>https?://[^\s]+)", reply)
+                if match:
+                    url = match.group("url")
+                    webbrowser.open(url)
+                else:
+                    print("No URL found in the text.")
+
             window["-INPUT-"].update("")
     elif event == "Save":
         filename = sg.popup_get_file(
@@ -70,4 +109,5 @@ while True:
             sg.popup(f"Chat log saved to {filename}")
     elif event == "Clear":
         window["-OUTPUT-"].update("")
+        
 window.close()
