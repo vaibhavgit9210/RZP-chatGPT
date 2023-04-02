@@ -10,9 +10,9 @@ with open('openai_api_key.txt', 'r') as file:
 openai.api_key = api_key
 
 my_theme = {
-    "BACKGROUND": "#3A3B3C",
+    "BACKGROUND": "#0D94FB",
     "TEXT": "#ffffff",
-    "INPUT": "#0C090A",
+    "INPUT": "#012652",
     "TEXT_INPUT": "#E5E4E2",
     "SCROLL": "#c7e78b",
     "BUTTON": ("#000080", "#ffffff"),
